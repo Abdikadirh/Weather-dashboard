@@ -2,121 +2,104 @@ import React from "react";
 import { motion } from "framer-motion";
 import { useTheme } from "../state/ThemeContext";
 import { useLanguage } from "../state/LanguageContext";
+import WeatherSymbol from "./WeatherSymbol";
 
-// Pick a locale for date formatting based on current UI language
 const localeFor = (lang) =>
   lang === "sv" ? "sv-SE" : lang === "ar" ? "ar-SA" : "en-US";
 
-const ForecastItem = ({ forecast }) => {
+const ForecastItem = ({
+  forecast,
+  isSelected,
+  onClick,
+  position,
+  hasHourlyData,
+}) => {
   const { unit, isDark } = useTheme();
-  const { language } = useLanguage();
+  const { language, t } = useLanguage();
 
-  // No data? Nothing to render.
   if (!forecast) return null;
 
-  // API can give us either `dt` (unix seconds) or `dt_txt` (ISO-ish string)
-  const date = forecast.dt
-    ? new Date(forecast.dt * 1000)
-    : new Date(forecast.dt_txt);
-
+  const date = new Date(forecast.dt * 1000);
   const locale = localeFor(language);
 
-  // Format weekday and time using the chosen locale
-  const weekdayShort = new Intl.DateTimeFormat(locale, {
-    weekday: "short",
-  }).format(date);
-  const hour = new Intl.DateTimeFormat(locale, {
-    hour: "2-digit",
-    minute: "2-digit",
-    hour12: false,
+  // Start with TODAY (position 0). No "Yesterday".
+  const dayLabel =
+    position === 0
+      ? t("today") || "today"
+      : new Intl.DateTimeFormat(locale, { weekday: "short" }).format(date);
+
+  const dateString = new Intl.DateTimeFormat(locale, {
+    month: "short",
+    day: "numeric",
   }).format(date);
 
-  // Basic weather bits
   const temp = Math.round(forecast.main?.temp ?? 0);
-  const icon = forecast.weather?.[0]?.icon; // e.g. "10d" or "10n"
-  const desc = forecast.weather?.[0]?.description ?? ""; // human-readable
-  const condition = forecast.weather?.[0]?.main?.toLowerCase() || "clear"; // "rain", "clouds", etc.
   const symbol = unit === "celsius" ? "C" : "F";
+  const icon = forecast.weather?.[0]?.icon;
+  const desc = forecast.weather?.[0]?.description ?? "";
 
-  /**
-   * Decide background / border / text colors so each tile looks readable
-   * in both dark and light themes, and also hints at the weather type.
-   */
-  const getForecastColors = () => {
-    const isDay = icon?.includes("d");
+  // gradients (unchanged)
+  const lightGrad = "bg-gradient-to-b from-sky-100 via-sky-50 to-blue-100";
+  const lightGradToday =
+    "bg-gradient-to-b from-sky-200 via-sky-100 to-blue-200";
+  const darkGrad = "bg-gradient-to-b from-slate-800 via-slate-900 to-slate-950";
+  const darkGradToday =
+    "bg-gradient-to-b from-blue-900 via-slate-900 to-slate-950";
 
-    // Night tiles: cooler blues in both themes
-    if (!isDay) {
-      return {
-        bg: isDark ? "bg-blue-900/40" : "bg-blue-100/70",
-        text: isDark ? "text-white" : "text-gray-900",
-        border: "border-blue-400/30",
-      };
-    }
-
-    // Daytime tiles: vary color by condition
-    switch (condition) {
-      case "clear":
-        return {
-          bg: isDark ? "bg-orange-900/40" : "bg-yellow-100/80",
-          text: isDark ? "text-white" : "text-gray-900",
-          border: "border-yellow-400/30",
-        };
-      case "clouds":
-        return {
-          bg: isDark ? "bg-gray-700/40" : "bg-gray-200/80",
-          text: isDark ? "text-white" : "text-gray-900",
-          border: "border-gray-400/30",
-        };
-      case "rain":
-      case "drizzle":
-        return {
-          bg: isDark ? "bg-blue-800/40" : "bg-blue-200/80",
-          text: isDark ? "text-white" : "text-gray-900",
-          border: "border-blue-500/30",
-        };
-      case "snow":
-        return {
-          bg: isDark ? "bg-blue-300/40" : "bg-white/80",
-          text: isDark ? "text-white" : "text-gray-900",
-          border: "border-blue-200/30",
-        };
-      default:
-        // Fallback for everything else (mist, haze, etc.)
-        return {
-          bg: isDark ? "bg-gray-600/40" : "bg-gray-100/80",
-          text: isDark ? "text-white" : "text-gray-900",
-          border: "border-gray-300/30",
-        };
-    }
+  const styles = {
+    bg:
+      position === 0
+        ? isDark
+          ? darkGradToday
+          : lightGradToday
+        : isDark
+        ? darkGrad
+        : lightGrad,
+    text: isDark ? "text-white" : "text-gray-900",
+    borderColor: isDark ? "border-slate-700" : "border-sky-200",
+    ringSelected: isDark ? "ring-blue-400/70" : "ring-sky-400/70",
+    hoverShadow: isDark ? "hover:shadow-blue-900/30" : "hover:shadow-sky-200",
   };
 
-  const c = getForecastColors();
+  // connect with hourly panel when selected (unchanged)
+  const joinHourly =
+    isSelected && hasHourlyData ? "rounded-b-none border-b-0 -mb-px z-10" : "";
 
   return (
     <motion.div
-      // Tiny lift on hover so the card feels clickable (even if it isn’t)
-      whileHover={{ scale: 1.04, y: -2 }}
-      className={`${c.bg} ${c.border} ${c.text} rounded-xl p-3 sm:p-4 text-center shadow-md border transition-transform duration-150 backdrop-blur-sm`}
+      whileHover={{ scale: 0.98, y: -2 }}
+      whileTap={{ scale: 0.98 }}
+      onClick={() => onClick(forecast)}
+      aria-pressed={isSelected}
+      className={`forecast-card ${styles.bg} ${styles.text}
+        border ${styles.borderColor} ${joinHourly}
+        rounded-xl p-4 text-center shadow-md transition-all duration-150
+        cursor-pointer min-w-[155px] shrink-0 origin-center transform-gpu
+        ${isSelected ? `ring-2 ring-inset ${styles.ringSelected}` : ""} ${
+        styles.hoverShadow
+      }`}
     >
-      {/* Top: day + time */}
-      <p className="font-semibold text-sm sm:text-base">{weekdayShort}</p>
-      <p className="text-xs sm:text-sm/none opacity-80">{hour}</p>
+      <div className="mb-3">
+        <p className="font-semibold text-sm sm:text-base capitalize">
+          {dayLabel}
+        </p>
+        <p className="text-xs sm:text-sm opacity-80 mt-1">{dateString}</p>
+      </div>
 
-      {/* Weather icon (when API provides one) */}
-      {icon && (
-        <img
-          src={`https://openweathermap.org/img/wn/${icon}@2x.png`}
-          alt={desc}
-          className="w-10 h-10 sm:w-12 sm:h-12 mx-auto my-2"
-        />
-      )}
+      {icon && <WeatherSymbol code={icon} size={36} className="my-1" />}
 
-      {/* Temperature + description */}
-      <p className="text-lg font-bold">
+      <p
+        className={`text-lg font-bold mb-2 ${position === 0 ? "text-xl" : ""}`}
+      >
         {temp}°{symbol}
       </p>
-      <p className="text-xs opacity-80 capitalize mt-1">{desc}</p>
+
+      <p className="text-xs opacity-80 capitalize mb-3 truncate">{desc}</p>
+
+      <div className="flex justify-center space-x-3 text-xs opacity-70">
+        <span>💧 {forecast.main.humidity}%</span>
+        <span>💨 {Math.round(forecast.wind.speed)}m/s</span>
+      </div>
     </motion.div>
   );
 };

@@ -3,14 +3,12 @@ import { motion } from "framer-motion";
 import { useTheme } from "../state/ThemeContext";
 import { useFavorites } from "../state/FavoritesContext";
 import { useLanguage } from "../state/LanguageContext";
+import WeatherSymbol from "./WeatherSymbol";
 
-/**
- * Decide which sky background class to use based on the current weather.
- * This only picks a broad vibe; detailed coloring is handled by the card overlay.
- */
+/** Decide a broad sky background based on weather */
 const themeFromWeather = (w) => {
   const main = (w?.weather?.[0]?.main || "").toLowerCase();
-  const icon = w?.weather?.[0]?.icon || ""; // openweather icons end with d/n for day/night
+  const icon = w?.weather?.[0]?.icon || "";
   const isNight = icon.endsWith("n");
 
   if (main.includes("thunder")) return "sky-thunder";
@@ -28,65 +26,60 @@ const WeatherCard = ({ weatherData }) => {
   const { addFavorite, removeFavorite, isFavorite } = useFavorites();
   const { t } = useLanguage();
 
-  // Safety: if the parent renders before data arrives, render nothing.
   if (!weatherData) return null;
 
-  // Unpack the bits we actually show on the card.
-  const { main, weather, wind, name, sys, id } = weatherData;
-  const currentWeather = weather[0];
+  const { main, weather, wind, name, sys, id, coord } = weatherData;
+  const currentWeather = weather[0]; // <-- use this
   const isCityFavorite = isFavorite(id);
   const skyClass = themeFromWeather(weatherData);
   const symbol = unit === "celsius" ? "C" : "F";
-  const getIcon = (code) => `https://openweathermap.org/img/wn/${code}@2x.png`;
 
-  // Toggle favorite for this city. Keep payload small but sufficient to re-use later.
   const toggleFav = () => {
     if (isCityFavorite) removeFavorite(id);
-    else
-      addFavorite({ id, name, country: sys.country, coord: weatherData.coord });
+    else addFavorite({ id, name, country: sys.country, coord });
   };
 
-  // Shared text/background tokens that flip cleanly between light/dark.
   const textMain = isDark ? "text-white" : "text-slate-900";
   const textSoft = isDark ? "text-slate-100/85" : "text-slate-600";
   const textSofter = isDark ? "text-slate-100/75" : "text-slate-700";
 
-  // Glass layer: transparent enough to let sky peek through, but readable on both modes.
   const glassPanel = isDark
     ? "bg-slate-900/35 border border-white/10"
-    : "bg-white/75 border border-white/60";
+    : "bg-white/55 border border-white/70";
 
-  // Divider line that won’t scream in either mode.
   const divider = isDark ? "border-white/10" : "border-slate-300/60";
 
-  // Fav button chip: matches glass style, with a subtle blur for depth.
   const favBtn = isDark
     ? "bg-slate-800/70 border-white/10"
     : "bg-white/80 border-white/60";
 
   return (
     <motion.div
-      // Gentle rise-in so the card feels alive.
       initial={{ opacity: 0, y: 18 }}
       animate={{ opacity: 1, y: 0 }}
-      // Sky theme sits behind the glass content.
       className={`relative overflow-hidden rounded-2xl p-0 mb-6 sky-base ${skyClass} sky-overlay`}
     >
-      {/* LIGHT MODE ONLY: a soft white wash to keep the whole card visibly brighter over the sky. */}
+      {/* LIGHT MODE ONLY: strong left glow + gentle overall wash */}
       {!isDark && (
-        <div
-          className="absolute inset-0 pointer-events-none
-                     bg-gradient-to-br from-white/33 via-white/100 to-white/80
-                     backdrop-saturate-100"
-          aria-hidden
-        />
+        <>
+          {/* 1) broad linear wash, brightest on the left */}
+          <div
+            className="absolute inset-0 pointer-events-none"
+            style={{
+              background:
+                "linear-gradient(90deg, rgba(238, 247, 254) 10%, rgba(247, 250, 255) 70%)",
+              backdropFilter: "saturate(1.25) contrast(1.05)",
+            }}
+            aria-hidden
+          />
+        </>
       )}
 
       {/* CONTENT LAYER (glass) */}
       <div
         className={`relative glass m-[1px] rounded-2xl p-4 sm:p-6 ${glassPanel}`}
       >
-        {/* Favorite toggle (top-right). The heart fills when saved. */}
+        {/* Favorite toggle */}
         <motion.button
           whileHover={{ scale: 1.08 }}
           whileTap={{ scale: 0.92 }}
@@ -116,15 +109,22 @@ const WeatherCard = ({ weatherData }) => {
           </svg>
         </motion.button>
 
-        {/* TOP ROW: left = icon + city, right = temps */}
+        {/* TOP ROW */}
         <div className="flex flex-col sm:flex-row justify-between items-center">
           {/* City + condition */}
           <div className="flex items-center mb-4 sm:mb-0 w-full sm:w-auto justify-center sm:justify-start">
-            <img
-              src={getIcon(currentWeather.icon)}
-              alt={currentWeather.description}
-              className="w-20 h-20 sm:w-24 sm:h-24 icon-tint"
-            />
+            <div className="relative">
+              <WeatherSymbol
+                code={currentWeather.icon}
+                size={56}
+                className="mr-3"
+              />
+              {/* Soft radial glow only for clear-sky day */}
+              {currentWeather.icon?.includes("01d") && (
+                <div className="sun-aura" />
+              )}
+            </div>
+
             <div className="ml-3 sm:ml-4">
               <h2 className={`text-lg sm:text-2xl font-extrabold ${textMain}`}>
                 {name}, {sys.country}
@@ -158,10 +158,10 @@ const WeatherCard = ({ weatherData }) => {
           </div>
         </div>
 
-        {/* Thin divider before stats */}
+        {/* Divider */}
         <div className={`mt-4 sm:mt-6 border-t ${divider}`} />
 
-        {/* QUICK STATS: small, scannable, responsive grid */}
+        {/* QUICK STATS */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 mt-4">
           <Stat
             label={t("humidity")}
@@ -185,10 +185,6 @@ const WeatherCard = ({ weatherData }) => {
   );
 };
 
-/**
- * Tiny stat cell used for the 4 quick stats row.
- * Keeps type scale and colors consistent across modes.
- */
 const Stat = ({ label, value, isDark }) => (
   <div className="text-center">
     <p

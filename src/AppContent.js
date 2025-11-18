@@ -30,39 +30,26 @@ const AppContent = () => {
   return (
     <div
       dir={direction}
-      className="
-        min-h-screen flex flex-col
-        bg-gradient-to-br from-blue-400 via-blue-500 to-purple-600
-        dark:from-gray-900 dark:via-blue-900 dark:to-purple-900
-        transition-colors duration-200
-      "
+      className="min-h-screen flex flex-col bg-white dark:bg-gray-900"
     >
-      {/* page background */}
-      <div className="fixed inset-0 bg-gradient-to-br from-blue-400 via-blue-500 to-purple-600 dark:from-gray-900 dark:via-blue-900 dark:to-purple-900 -z-10" />
-
       <OfflineBanner />
 
-      {/* ===== NAVBAR =====
-         Grid with 3 columns: LEFT (burger), CENTER (title), RIGHT (links + controls).
-         No absolute positioning → no vertical misalignment.
-      */}
+      {/* ===== NAVBAR ===== */}
       <nav
         className="
-          sticky top-0 z-40 border-b border-gray-200/70 dark:border-white/10 backdrop-blur-md
-          bg-white/70
-          dark:bg-slate-900/65   /* darker than page bg so it reads as a bar */
-        "
+        sticky top-0 z-40
+        border-b border-slate-200/70 dark:border-slate-800
+        bg-slate-100/90 dark:bg-slate-800/95 
+        backdrop-blur-md
+      "
       >
-        {/* subtle white wash only in light mode */}
-        <div className="absolute inset-0 pointer-events-none bg-gradient-to-b from-white/50 to-transparent dark:hidden" />
-
         <div className="relative max-w-6xl mx-auto px-4 sm:px-6">
           {/* 3 columns; everything sits on the same baseline */}
           <div className="grid grid-cols-[auto,1fr,auto] items-center h-14 sm:h-16 gap-3">
             {/* LEFT: mobile menu button */}
             <button
               onClick={() => setIsMobileMenuOpen((s) => !s)}
-              className="sm:hidden p-2 rounded-lg text-gray-700 hover:bg-gray-100/80 dark:text-white/85 dark:hover:bg-white/10"
+              className="sm:hidden p-2 rounded-lg text-gray-700 hover:bg-gray-100/80 dark:text-white/85 dark:hover:bg-gray-700/80"
               aria-label={t("toggleMenu") || "Toggle menu"}
               aria-expanded={isMobileMenuOpen}
               aria-controls="mobile-menu"
@@ -82,7 +69,7 @@ const AppContent = () => {
               </svg>
             </button>
 
-            {/* CENTER: brand (kept truly centered; no scale on hover to avoid “jump”) */}
+            {/* CENTER: brand (kept truly centered; no scale on hover to avoid "jump") */}
             <div className="flex justify-center">
               <Link to="/" className="inline-flex">
                 <span className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white hover:opacity-90">
@@ -115,8 +102,8 @@ const AppContent = () => {
                 initial={{ opacity: 0, height: 0 }}
                 animate={{ opacity: 1, height: "auto" }}
                 exit={{ opacity: 0, height: 0 }}
-                className="sm:hidden overflow-hidden border-t border-gray-200/70 dark:border-white/10
-                           bg-white/85 dark:bg-slate-900/70 backdrop-blur-md"
+                className="sm:hidden overflow-hidden border-t border-gray-200/70 dark:border-gray-700/70
+                         bg-white/95 dark:bg-gray-900/95 backdrop-blur-md"
               >
                 <div className="py-2 space-y-1">
                   <MobileNavLink
@@ -142,7 +129,7 @@ const AppContent = () => {
       </nav>
 
       {/* MAIN (grows and pushes footer) */}
-      <main className="flex-1" aria-live="polite">
+      <main className="flex-1 bg-white dark:bg-gray-900" aria-live="polite">
         <Suspense fallback={<LoadingFallback />}>
           <Routes>
             <Route path="/" element={<Dashboard />} />
@@ -152,10 +139,15 @@ const AppContent = () => {
         </Suspense>
       </main>
 
-      {/* FOOTER (same visual language as the nav) */}
-      <footer className="mt-auto border-t border-gray-200/70 dark:border-white/10 backdrop-blur-md bg-white/80 dark:bg-slate-900/65">
+      {/* FOOTER - Updated for better contrast */}
+      <footer
+        className="        mt-auto
+        border-t border-slate-200/70 dark:border-slate-800
+        bg-slate-100/90 dark:bg-slate-800/95  
+        backdrop-blur-md"
+      >
         <div className="max-w-6xl mx-auto px-4 sm:px-6 py-4 sm:py-6">
-          <p className="text-center text-gray-700 dark:text-white/80 text-xs sm:text-sm">
+          <p className="text-center text-gray-700 dark:text-gray-300 text-xs sm:text-sm">
             © 2025 {t("weatherDashboard") || "Weather Dashboard"}.{" "}
             {t("allRightsReserved") || "All rights reserved."}
           </p>

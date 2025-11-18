@@ -9,6 +9,7 @@
     font-family: 'Noto Sans Arabic', sans-serif;
 }
 
+html,
 body {
     margin: 0;
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
@@ -16,6 +17,7 @@ body {
         'Noto Sans Arabic', sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    max-width: 100%;
     overflow-x: hidden;
     /* This will hide horizontal scroll */
 }
@@ -367,6 +369,52 @@ body {
 .dark ::-webkit-scrollbar-thumb:hover {
     background: #6b7280;
 }
+/* ===========================
+   5-Day Forecast: hide h-scrollbar
+   =========================== */
+.forecast-scroll {
+    scrollbar-width: none;
+    /* Firefox */
+}
+
+/* Chrome / Edge / Safari */
+.forecast-scroll::-webkit-scrollbar {
+    height: 0px;
+    /* no visible bar */
+}
+
+.forecast-scroll::-webkit-scrollbar-track,
+.forecast-scroll::-webkit-scrollbar-thumb {
+    background: transparent;
+}
+
+
+/* ===========================
+   Hourly Forecast: thinner bar
+   =========================== */
+.hourly-scroll {
+    scrollbar-width: thin;
+    /* Firefox */
+}
+
+/* WebKit browsers */
+.hourly-scroll::-webkit-scrollbar {
+    height: 4px;
+    /* thinner than global 8px */
+}
+
+.hourly-scroll::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.hourly-scroll::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 9999px;
+}
+
+.dark .hourly-scroll::-webkit-scrollbar-thumb {
+    background: #4b5563;
+}
 
 /* Loading skeleton animations */
 .skeleton {
@@ -515,6 +563,34 @@ body {
     background:
         radial-gradient(180px 180px at 12% 0%, rgba(112, 128, 144, 0.4), transparent),
         linear-gradient(180deg, #2F4F4F 0%, #483D8B 100%);
+}
+
+/* Add to your index.css */
+.weather-icon-sun {
+    filter: drop-shadow(0 0 8px rgba(255, 204, 0, 0.6));
+}
+
+.weather-icon-sun::before {
+    content: "";
+    position: absolute;
+    inset: -4px;
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.3) 0%, transparent 70%);
+    border-radius: 50%;
+    animation: sunPulse 3s ease-in-out infinite;
+}
+
+@keyframes sunPulse {
+
+    0%,
+    100% {
+        opacity: 0.4;
+        transform: scale(1);
+    }
+
+    50% {
+        opacity: 0.8;
+        transform: scale(1.1);
+    }
 }
 
 /* === Sky themes + glass === */

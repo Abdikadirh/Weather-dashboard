@@ -50,6 +50,10 @@ const translations = {
     uvIndex: "UV Index",
     precipitation: "Precipitation",
 
+    // Day Labels
+    yesterday: "Yesterday",
+    today: "Today",
+
     // Settings
     darkMode: "Dark Mode",
     toggleThemes: "Toggle between light and dark themes",
@@ -75,6 +79,7 @@ const translations = {
     feature4: "Fully responsive design",
     feature5: "Accessibility features",
     feature6: "Favorite cities and recent searches",
+    feature7: "Hourly forecast for each day",
 
     // Errors
     cityNotFound: "City not found",
@@ -103,6 +108,12 @@ const translations = {
 
     // Additional Info
     additionalInfo: "Additional Information",
+
+    // Hourly Forecast
+    hourlyForecastTitle: "Hourly Forecast",
+
+    // Hourly Forecast not available for past days message
+    noHourlyForPast: "Hourly details aren’t available for past days.",
   },
   sv: {
     // Navigation
@@ -135,6 +146,10 @@ const translations = {
     uvIndex: "UV-index",
     precipitation: "Nederbörd",
 
+    // Day Labels
+    yesterday: "Igår",
+    today: "Idag",
+
     // Settings
     darkMode: "Mörkt Läge",
     toggleThemes: "Växla mellan ljust och mörkt tema",
@@ -160,6 +175,7 @@ const translations = {
     feature4: "Fullt responsiv design",
     feature5: "Tillgänglighetsfunktioner",
     feature6: "Favoritstäder och senaste sökningar",
+    feature7: "Timprognos för varje dag",
 
     // Errors
     cityNotFound: "Staden hittades inte",
@@ -189,6 +205,13 @@ const translations = {
 
     // Additional Info
     additionalInfo: "Ytterligare Information",
+
+    // Hourly Forecast
+    hourlyForecastTitle: "Timprognos",
+
+    // Hourly Forecast not available for past days message
+    noHourlyForPast:
+      "Timvisa detaljer är inte tillgängliga för tidigare dagar.",
   },
   ar: {
     // Navigation
@@ -221,6 +244,10 @@ const translations = {
     uvIndex: "مؤشر الأشعة",
     precipitation: "هطول الأمطار",
 
+    // Day Labels
+    yesterday: "أمس",
+    today: "اليوم",
+
     // Settings
     darkMode: "الوضع الليلي",
     toggleThemes: "تبديل بين الوضع النهاري والليلي",
@@ -246,6 +273,7 @@ const translations = {
     feature4: "تصميم متجاوب بالكامل",
     feature5: "ميزات إمكانية الوصول",
     feature6: "المدن المفضلة والبحث الحديث",
+    feature7: "توقعات كل ساعة لكل يوم",
 
     // Errors
     cityNotFound: "المدينة غير موجودة",
@@ -275,6 +303,12 @@ const translations = {
 
     // Additional Info
     additionalInfo: "معلومات إضافية",
+
+    // Hourly Forecast
+    hourlyForecastTitle: "التوقعات كل ساعة",
+
+    // Hourly Forecast not available for past days message
+    noHourlyForPast: "لا تتوفر تفاصيل الساعة للأيام الماضية.",
   },
 };
 
