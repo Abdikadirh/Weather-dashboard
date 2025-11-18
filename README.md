@@ -5,7 +5,7 @@ A modern, responsive React app that shows real-time weather and forecasts — wi
 ## ✨ Features
 
 - 🌍 **Real-time weather** for any city (OpenWeatherMap)
-- 📅 **5-Day forecast** + **Hourly temperature** chart (Recharts)
+- 📅 **5-Day forecast** + **Hourly forecast** + **Hourly temperature** chart (Recharts)
 - 🌓 **Theme toggle** (light/dark) with localStorage persistence
 - 🌐 **Language switcher** (English, Svenska, العربية) + RTL support
 - ⭐ **Favorites** & 🕑 **Recent searches** (localStorage)
